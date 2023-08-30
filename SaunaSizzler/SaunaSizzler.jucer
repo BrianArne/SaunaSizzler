@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="tF0hF9" name="SaunaSizzler" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
+              pluginFormats="buildVST3">
   <MAINGROUP id="V0QxW7" name="SaunaSizzler">
     <GROUP id="{ADE38DFE-5138-F4C6-3CD5-02BA2C1CE829}" name="Source">
       <FILE id="lCiFq8" name="PluginProcessor.cpp" compile="1" resource="0"
