@@ -19,8 +19,8 @@ namespace sauna {
 
 class Exciter {
 public:
-    Exciter();
-    ~Exciter();
+    Exciter() {};
+    ~Exciter() {};
     
     // No copy semantics
     Exciter(const Exciter&) = delete;
@@ -44,7 +44,7 @@ public:
             for (unsigned int sample = 0; sample < numSamples; sample++)
             {
                 // Unity gain for testing
-                output[channel][sample] = 1.0 * input[channel][number];
+                output[channel][sample] = 1.0 * input[channel][sample];
             }
         }
     }
