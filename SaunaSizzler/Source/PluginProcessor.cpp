@@ -98,6 +98,15 @@ void SaunaSizzlerAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     exciter.prepare(sampleRate);
+    
+    // Prepare specs
+    juce::dsp::ProcessSpec spec;
+    spec.sampleRate = sampleRate;
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels = getTotalNumOutputChannels();
+    
+    // Prepare chain
+    chain.prepare(spec);
 }
 
 void SaunaSizzlerAudioProcessor::releaseResources()
@@ -166,7 +175,12 @@ void SaunaSizzlerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // }
     
     // Apply exciter
-    exciter.process(buffer.getArrayOfWritePointers(), buffer.getArrayOfReadPointers(), numChannels, numSamples);
+    // exciter.process(buffer.getArrayOfWritePointers(), buffer.getArrayOfReadPointers(), numChannels, numSamples);
+    
+    // process block
+    juce::dsp::AudioBlock<float> block(buffer);
+    juce::dsp::ProcessContextReplacing<float> context(block);
+    chain.process(context);
 }
 
 //==============================================================================

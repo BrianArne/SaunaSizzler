@@ -59,6 +59,7 @@ public:
 
 private:
     sauna::Exciter exciter;
+    juce::dsp::ProcessorChain<sauna::ExciterProcessor> chain;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SaunaSizzlerAudioProcessor)
 };

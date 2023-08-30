@@ -8,14 +8,62 @@
   description:        Exciter classes.
   license:            GPL
   minimumCppStandard: 17
+  dependencies:       juce_dsp
 
  END_JUCE_MODULE_DECLARATION
 */
 
 #pragma once
 #include <algorithm>
+#include <juce_dsp/juce_dsp.h>
 
 namespace sauna {
+
+class ExciterProcessor: public juce::dsp::ProcessorBase
+{
+public:
+    ExciterProcessor() {};
+    ~ExciterProcessor() {};
+    
+    void prepare(const juce::dsp::ProcessSpec& spec) override
+    {
+        // Prepare specs here
+    }
+    
+    void process(const juce::dsp::ProcessContextReplacing<float>& context) override
+    {
+        // Do processing here
+        const auto& inputBlock = context.getInputBlock();
+        auto& outputBlock = context.getOutputBlock();
+        const auto numChannels = outputBlock.getNumChannels();
+        const auto numSamples = outputBlock.getNumSamples();
+        
+        if (context.isBypassed)
+        {
+            outputBlock.copyFrom(inputBlock);
+            return;
+        }
+        
+        for (size_t channel = 0; channel < numChannels; ++channel)
+        {
+            auto* inputSamples = inputBlock.getChannelPointer(channel);
+            auto* outputSamples = outputBlock.getChannelPointer(channel);
+
+            for (size_t i = 0; i < numSamples; ++i)
+            {
+                outputSamples[i] = 1.0 * inputSamples[i];
+            }
+        }
+        
+    }
+    
+    void reset() override {
+        
+    }
+    
+private:
+    
+};
 
 class Exciter {
 public:
