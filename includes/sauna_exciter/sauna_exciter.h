@@ -8,78 +8,92 @@
   description:        Exciter classes.
   license:            GPL
   minimumCppStandard: 17
-  dependencies:       juce_dsp
+  dependencies:       juce_audio_basics, juce_dsp
 
  END_JUCE_MODULE_DECLARATION
 */
 
 #pragma once
 #include <algorithm>
+#include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_dsp/juce_dsp.h>
 
 namespace sauna {
 
-class ExciterProcessor: public juce::dsp::ProcessorBase
-{
+class Saturator {
 public:
-    ExciterProcessor() {};
-    ~ExciterProcessor() {};
+    Saturator(): preGain {juce::Decibels::decibelsToGain(6.0f)} {
+        setSaturation(SaturationType::HardClipping);
+    };
     
-    void prepare(const juce::dsp::ProcessSpec& spec) override
-    {
-        // Prepare specs here
-    }
+    ~Saturator() {};
     
-    void process(const juce::dsp::ProcessContextReplacing<float>& context) override
-    {
-        // Do processing here
-        const auto& inputBlock = context.getInputBlock();
-        auto& outputBlock = context.getOutputBlock();
-        const auto numChannels = outputBlock.getNumChannels();
-        const auto numSamples = outputBlock.getNumSamples();
-        
-        if (context.isBypassed)
-        {
-            outputBlock.copyFrom(inputBlock);
-            return;
-        }
-        
-        for (size_t channel = 0; channel < numChannels; ++channel)
-        {
-            auto* inputSamples = inputBlock.getChannelPointer(channel);
-            auto* outputSamples = outputBlock.getChannelPointer(channel);
-
-            for (size_t i = 0; i < numSamples; ++i)
-            {
-                outputSamples[i] = 1.0 * inputSamples[i];
-            }
-        }
-        
-    }
-    
-    void reset() override {
-        
-    }
-    
-private:
-    
-};
-
-class Exciter {
-public:
-    Exciter() {};
-    ~Exciter() {};
+    enum SaturationType {
+        Tanh,
+        ASinh,
+        HardClipping,
+        SoftClipping,
+    };
     
     // No copy semantics
-    Exciter(const Exciter&) = delete;
-    const Exciter& operator=(const Exciter&) = delete;
+    Saturator(const Saturator&) = delete;
+    const Saturator& operator=(const Saturator&) = delete;
     
     // No move semantics
-    Exciter(Exciter&&) = delete;
-    const Exciter& operator=(Exciter&&) = delete;
+    Saturator(Saturator&&) = delete;
+    const Saturator& operator=(Saturator&&) = delete;
     
-    void prepare(double newSampleRate) {
-        sampleRate = newSampleRate;
+    void setSaturation(SaturationType type) {
+        if (type == SaturationType::Tanh) {
+            saturation = [this] (float x) {return applyTanh(x);};
+        }
+        
+        else if (type == SaturationType::ASinh) {
+            saturation = [this] (float x) {return applyASinh(x);};
+        }
+        
+        else if (type == SaturationType::HardClipping) {
+            saturation = [this] (float x) {return applyHardClipping(x);};
+        }
+        
+        else if (type == SaturationType::SoftClipping) {
+            saturation = [this] (float x) {return applySoftClipping(x);};
+        }
+        
+        // If you hit this assertion is because you selected an invalid saturation type
+        jassert(false);
+    }
+    
+    float applyTanh(float x) {
+        return std::tanhf(x);
+    }
+    
+    float applyASinh(float x) {
+        return std::asinhf(x);
+    }
+    
+    float applySoftClipping(float x){
+        if (x > 1.0f) {
+            return 2.0f / 3.0f;
+        }
+        
+        if (x < -1.0f) {
+            return -2.0f / 3.0f;
+        }
+        
+        return x - (x * x * x) / 3.0f;
+    }
+    
+    float applyHardClipping(float x) {
+        if (x > 1.0f) {
+            return 1.0f;
+        }
+        
+        if (x < -1.0f) {
+            return -1.0f;
+        }
+        
+        return x;
     }
 
     void process(float* const* output, const float* const* input, unsigned int numChannels, unsigned int numSamples) {
@@ -92,14 +106,61 @@ public:
             for (unsigned int sample = 0; sample < numSamples; sample++)
             {
                 // Unity gain for testing
-                output[channel][sample] = 1.0 * input[channel][sample];
+                output[channel][sample] = saturation(preGain * input[channel][sample]);
             }
         }
     }
     
 private:
-    double sampleRate {1.0};
+    float preGain;
+    std::function<float(float)> saturation;
 };
+
+
+class SaturatorProcessor: public juce::dsp::ProcessorBase
+{
+public:
+    SaturatorProcessor(): saturator() {};
+    ~SaturatorProcessor() {};
+    
+    void prepare(const juce::dsp::ProcessSpec& spec) override {
+    }
+    
+    void reset() override {
+        
+    }
+    
+    void process(const juce::dsp::ProcessContextReplacing<float>& context) override {
+        // Get input blocks
+        const auto& inputBlock = context.getInputBlock();
+        auto& outputBlock = context.getOutputBlock();
+        
+        const auto inputNumChannels = inputBlock.getNumChannels();
+        const auto outputNumChannels = outputBlock.getNumChannels();
+        
+        const float* input[inputNumChannels];
+        
+        // Get channel pointers
+        for (size_t i = 0; i < inputNumChannels; i++) {
+            input[i] = inputBlock.getChannelPointer(i);
+        }
+        
+        float* output[outputNumChannels];
+        
+        for (size_t i = 0; i < outputNumChannels; i++) {
+            output[i] = outputBlock.getChannelPointer(i);
+        }
+        
+        // Do processing
+        saturator.process(output, input, static_cast<unsigned int>(inputNumChannels), static_cast<unsigned int>(inputBlock.getNumSamples()));
+        
+    }
+    
+private:
+    Saturator saturator;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SaturatorProcessor)
+};
+
 
 class Steamer {
 public:
@@ -107,7 +168,7 @@ public:
     ~Steamer() {}
     
     // No copy semantics
-    Steamer(const Exciter&) = delete;
+    Steamer(const Steamer&) = delete;
     const Steamer& operator=(const Steamer&) = delete;
     
     // No move semantics

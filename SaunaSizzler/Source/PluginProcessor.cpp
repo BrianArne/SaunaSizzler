@@ -19,9 +19,7 @@ SaunaSizzlerAudioProcessor::SaunaSizzlerAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       ), exciter()
-#else
-: exciter()
+                       )
 #endif
 {
 }
@@ -95,10 +93,6 @@ void SaunaSizzlerAudioProcessor::changeProgramName (int index, const juce::Strin
 //==============================================================================
 void SaunaSizzlerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
-    exciter.prepare(sampleRate);
-    
     // Prepare specs
     juce::dsp::ProcessSpec spec;
     spec.sampleRate = sampleRate;
@@ -107,8 +101,8 @@ void SaunaSizzlerAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     
     
     // Testing Params
-    juce::Reverb::Parameters reverbParams{1.0f, 0.5f, 0.9f, 0.4f, 1.0f, 0.0f};
-    chain.get<ProcessorIndex::reverbIndex>().setParameters(reverbParams);
+    //juce::Reverb::Parameters reverbParams{1.0f, 0.5f, 0.9f, 0.4f, 1.0f, 0.0f};
+    //chain.get<ProcessorIndex::reverbIndex>().setParameters(reverbParams);
     
     // Prepare chain
     chain.prepare(spec);
@@ -151,8 +145,8 @@ void SaunaSizzlerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::ScopedNoDenormals noDenormals;
     
     // Get channels
-    const unsigned int numChannels {static_cast<unsigned int>(buffer.getNumChannels())};
-    const unsigned int numSamples {static_cast<unsigned int>(buffer.getNumSamples())};
+    // const unsigned int numChannels {static_cast<unsigned int>(buffer.getNumChannels())};
+    // const unsigned int numSamples {static_cast<unsigned int>(buffer.getNumSamples())};
     
     // auto totalNumInputChannels  = getTotalNumInputChannels();
     // auto totalNumOutputChannels = getTotalNumOutputChannels();
