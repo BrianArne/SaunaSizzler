@@ -14,6 +14,7 @@
 //==============================================================================
 /**
 */
+
 class SaunaSizzlerAudioProcessor  : public juce::AudioProcessor
                             #if JucePlugin_Enable_ARA
                              , public juce::AudioProcessorARAExtension
@@ -58,8 +59,15 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
+    enum ProcessorIndex
+    {
+        exciterIndex = 0,
+        steamerIndex,
+        reverbIndex
+    };
+    
     sauna::Exciter exciter;
-    juce::dsp::ProcessorChain<sauna::ExciterProcessor> chain;
+    juce::dsp::ProcessorChain<sauna::ExciterProcessor, sauna::SteamerProcessor, juce::dsp::Reverb> chain;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SaunaSizzlerAudioProcessor)
 };

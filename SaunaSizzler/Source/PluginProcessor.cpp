@@ -105,6 +105,11 @@ void SaunaSizzlerAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     spec.maximumBlockSize = samplesPerBlock;
     spec.numChannels = getTotalNumOutputChannels();
     
+    
+    // Testing Params
+    juce::Reverb::Parameters reverbParams{1.0f, 0.5f, 0.9f, 0.4f, 1.0f, 0.0f};
+    chain.get<ProcessorIndex::reverbIndex>().setParameters(reverbParams);
+    
     // Prepare chain
     chain.prepare(spec);
 }
