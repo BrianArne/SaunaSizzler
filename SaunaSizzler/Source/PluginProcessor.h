@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <sauna_exciter/sauna_exciter.h>
 
 //==============================================================================
 /**
@@ -57,6 +58,8 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
+    sauna::Exciter exciter;
+    juce::dsp::ProcessorChain<sauna::ExciterProcessor> chain;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SaunaSizzlerAudioProcessor)
 };

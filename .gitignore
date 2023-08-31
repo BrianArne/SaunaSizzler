@@ -1,1 +1,9 @@
+# macOS files
 .DS_Store
+
+# Alias
+Projucer
+
+# JUCE
+SaunaSizzler/Builds
+SaunaSizzler/JuceLibraryCode
