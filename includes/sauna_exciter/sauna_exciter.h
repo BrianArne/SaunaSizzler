@@ -22,8 +22,8 @@ namespace sauna {
 
 class Saturator {
 public:
-    Saturator(): preGain {juce::Decibels::decibelsToGain(6.0f)} {
-        setSaturation(SaturationType::HardClipping);
+    Saturator(): preGain {juce::Decibels::decibelsToGain(6.0f)}, tubeQ {-0.2f}, tubeDist {8.0f} {
+        setSaturation(SaturationType::Tube);
     };
     
     ~Saturator() {};
@@ -33,6 +33,7 @@ public:
         ASinh,
         HardClipping,
         SoftClipping,
+        Tube
     };
     
     // No copy semantics
@@ -60,8 +61,14 @@ public:
             saturation = [this] (float x) {return applySoftClipping(x);};
         }
         
-        // If you hit this assertion is because you selected an invalid saturation type
-        jassert(false);
+        else if (type == SaturationType::Tube) {
+            saturation = [this] (float x) {return applyTubeSaturator(x);};
+        }
+        
+        else {
+            // If you hit this assertion is because you selected an invalid saturation type
+            jassert(false);
+        }
     }
     
     float applyTanh(float x) {
@@ -95,6 +102,14 @@ public:
         
         return x;
     }
+    
+    float applyTubeSaturator(float x) {
+        if (x == tubeQ) {
+            return (1.0f / tubeDist) + (tubeQ / (1.0f - expf(tubeDist * tubeQ)));
+        } else {
+            return ((x - tubeQ) / (1.0f - (expf(-1.0f * tubeDist * (x - tubeQ))))) + (tubeQ / (1.0f - expf(tubeDist * tubeQ)));
+        }
+    }
 
     void process(float* const* output, const float* const* input, unsigned int numChannels, unsigned int numSamples) {
         
@@ -113,6 +128,8 @@ public:
     
 private:
     float preGain;
+    float tubeQ;
+    float tubeDist;
     std::function<float(float)> saturation;
 };
 
