@@ -12,6 +12,17 @@
       <FILE id="vDwSzc" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="uv4tAZ" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <GROUP id="{23E8A4DE-7E66-5CE7-1A38-BB154E8A1037}" name="Widgets">
+        <FILE id="V5GTst" name="Dials.h" compile="0" resource="0" file="Source/Widgets/Dials.h"/>
+        <GROUP id="{8713C4C8-D775-DA59-8A78-BD33460CBA63}" name="Images">
+          <FILE id="xPKEOv" name="bucket.png" compile="0" resource="1" file="Source/Widgets/Images/bucket.png"
+                xcodeResource="1"/>
+          <FILE id="r9QzNL" name="saunaBackground.jpg" compile="0" resource="1"
+                file="Source/Widgets/Images/saunaBackground.jpg" xcodeResource="1"/>
+          <FILE id="oXs0uu" name="saunaBackground2.jpg" compile="0" resource="1"
+                file="Source/Widgets/Images/saunaBackground2.jpg" xcodeResource="1"/>
+        </GROUP>
+      </GROUP>
     </GROUP>
   </MAINGROUP>
   <MODULES>
