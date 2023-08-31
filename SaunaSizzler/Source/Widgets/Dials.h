@@ -39,19 +39,20 @@ public:
 
         g.setOpacity(1);
         // outline
-        g.setColour (juce::Colours::grey);
-        g.drawEllipse (rx, ry, rw, rw, 2.0f);
+        g.setColour(juce::Colours::grey);
+        g.drawEllipse(rx, ry, rw, rw, 2.0f);
 
         juce::Path p;
         auto pointerLength = radius * 0.33f;
         auto pointerThickness = 6.0f;
-        p.addRectangle (-pointerThickness * 0.5f, -radius, pointerThickness, pointerLength);
-        p.applyTransform (juce::AffineTransform::rotation (angle).translated (centreX, centreY));
+        p.addRectangle(-pointerThickness * 0.5f, -radius, pointerThickness, pointerLength);
+        p.applyTransform(juce::AffineTransform::rotation (angle).translated (centreX, centreY));
 
         // pointer
         g.setColour (juce::Colours::green);
         g.fillPath (p);
         
+        // bucket image
         g.setOpacity(0.3);
         g.setColour(juce::Colours::white);
         const auto imageSize = height * 0.3;
@@ -65,11 +66,26 @@ public:
 class StandardDial: public juce::Slider
 {
 public:
-    StandardDial()
+    StandardDial(const juce::String& knobName="")
     {
+        setInterceptsMouseClicks(true, false);
         setSliderStyle (juce::Slider::RotaryVerticalDrag);
         setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
+        
+        knobLabel.setText(knobName, juce::NotificationType::dontSendNotification);
+        knobLabel.setJustificationType(juce::Justification::horizontallyCentred);
+        knobLabel.getLookAndFeel().setColour(juce::Label::ColourIds::textColourId, juce::Colours::white);
+        knobLabel.setInterceptsMouseClicks(false, true);
+        addAndMakeVisible(knobLabel);
     }
+    
+    void resized() override {
+        knobLabel.centreWithSize(getWidth(), getHeight());
+        juce::Slider::resized();
+    }
+    
+private:
+    juce::Label knobLabel;
 };
 
 
