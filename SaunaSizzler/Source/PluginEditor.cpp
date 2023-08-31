@@ -16,6 +16,8 @@ SaunaSizzlerAudioProcessorEditor::SaunaSizzlerAudioProcessorEditor (SaunaSizzler
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     
+    
+    
     // Add all UI components
     addAndMakeVisible(bigBoyDial);
     addAndMakeVisible(lfoDial);
@@ -36,7 +38,12 @@ SaunaSizzlerAudioProcessorEditor::SaunaSizzlerAudioProcessorEditor (SaunaSizzler
 
     addAndMakeVisible(header);
     addAndMakeVisible(footer);
+    
+    addAndMakeVisible(magicButton);
     setSize (720, 405);
+    
+    magicButton.addListener(this);
+    updateUIMode();
 }
 
 SaunaSizzlerAudioProcessorEditor::~SaunaSizzlerAudioProcessorEditor()
@@ -66,7 +73,7 @@ void SaunaSizzlerAudioProcessorEditor::resized()
     footer.setBounds (area.removeFromBottom (halfHeight));
     
     // Positioning header elements
-    bigBoyDial.centreWithSize(bigBoyDial.getParentHeight() * 0.8, bigBoyDial.getParentHeight() * 0.8);
+    bigBoyDial.centreWithSize(bigBoyDial.getParentHeight() * 0.9, bigBoyDial.getParentHeight() * 0.9);
     
     // Positioning footer elements
     auto footerArea = footer.getLocalBounds();
@@ -76,10 +83,41 @@ void SaunaSizzlerAudioProcessorEditor::resized()
     reverbDial.setBounds(footerArea.removeFromLeft (contentItemWidth));
     steamDial.setBounds(footerArea.removeFromLeft (contentItemWidth));
     
-    const auto smallKnobHeight = contentItemWidth / 2;//footerArea.getHeight() / 2;
-
+    const auto smallKnobHeight = contentItemWidth / 2;
     smallLeftDial.setBounds(getWidth() - contentItemWidth, (footerArea.getHeight() - contentItemWidth) / 2, contentItemWidth / 2, contentItemWidth / 2);
     smallRightDial.setBounds(getWidth() - contentItemWidth / 2,
                              footerArea.getHeight() / 2 - (footerArea.getHeight() / 2 - contentItemWidth / 2) / 2,
                              smallKnobHeight, smallKnobHeight);
+    
+    magicButton.setSize(150, 50);
+    updateUIMode();
+}
+
+void SaunaSizzlerAudioProcessorEditor::updateUIMode()
+{
+    header.setVisible(!advancedModeEnabled);
+    footer.setVisible(advancedModeEnabled);
+    
+    if (advancedModeEnabled)
+    {
+        magicButton.setBounds(getWidth() / 2 - magicButton.getWidth() / 2,                          // x
+                              header.getY() + header.getHeight() / 2 - magicButton.getHeight() / 2, // y
+                              200, 45);                                                             // width and height
+        magicButton.setButtonText("Bring back the magic knob!");
+    }
+    else
+    {
+        magicButton.setBounds(getWidth() / 2 - magicButton.getWidth() / 2,                          // x
+                              footer.getY() + footer.getHeight() / 2 - magicButton.getHeight() / 2, // y
+                              200, 45);                                                             // width and height
+        magicButton.setButtonText("Not enough of controls?");
+    }
+}
+
+void SaunaSizzlerAudioProcessorEditor::buttonClicked (juce::Button* button)
+{
+    if (button == &magicButton) {
+        advancedModeEnabled = !advancedModeEnabled;
+        updateUIMode();
+    }
 }
