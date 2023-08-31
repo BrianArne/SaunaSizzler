@@ -28,6 +28,7 @@ public:
     
     ~Saturator() {};
     
+    // This enum is the only thing that is necessary to hook up to the front end
     enum SaturationType {
         Tanh,
         ASinh,
