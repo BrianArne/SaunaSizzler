@@ -100,4 +100,80 @@ public:
 private:
     double sampleRate {1.0};
 };
+
+class Steamer {
+public:
+    Steamer() {}
+    ~Steamer() {}
+    
+    // No copy semantics
+    Steamer(const Exciter&) = delete;
+    const Steamer& operator=(const Steamer&) = delete;
+    
+    // No move semantics
+    Steamer(Steamer&&) = delete;
+    const Steamer& operator=(Steamer&&) = delete;
+    
+    void prepare() { }
+
+    void process(float* const* output, const float* const* input, unsigned int numChannels, unsigned int numSamples) {
+        
+        // To avoid using it in more than 2 channels
+        numChannels = std::min(numChannels, 2u);
+        
+        for (unsigned int channel = 0; channel < numChannels; channel++)
+        {
+            for (unsigned int sample = 0; sample < numSamples; sample++)
+            {
+                // Unity gain for testing
+                output[channel][sample] += random.nextFloat() * 0.25f - 0.125f;
+            }
+        }
+    }
+    
+private:
+    juce::Random random;
+};
+
+
+class SteamerProcessor : public juce::dsp::ProcessorBase {
+public:
+    SteamerProcessor() {};
+    ~SteamerProcessor() {};
+    
+    void prepare(const juce::dsp::ProcessSpec& spec) override
+    {
+    }
+    
+    void process(const juce::dsp::ProcessContextReplacing<float>& context) override
+    {
+        // Do processing here
+        const auto& inputBlock = context.getInputBlock();
+        auto& outputBlock = context.getOutputBlock();
+        
+        const auto inputNumChannels = inputBlock.getNumChannels();
+        const auto outputNumChannels = outputBlock.getNumChannels();
+        
+        
+        const float* input[inputNumChannels];
+        for (int i = 0; i < inputBlock.getNumChannels(); i++){
+            input[i] = inputBlock.getChannelPointer(i);
+        }
+        
+        float* output[outputNumChannels];
+        for (int i = 0; i < outputBlock.getNumChannels(); i++){
+            output[i] = outputBlock.getChannelPointer(i);
+        }
+        
+        steamer.process(output, input, static_cast<unsigned int>(inputBlock.getNumChannels()), static_cast<unsigned int>(inputBlock.getNumSamples()));
+    }
+    
+    void reset() override {
+        
+    }
+    
+private:
+    Steamer steamer;
+};
+
 } // end sauna namespace
