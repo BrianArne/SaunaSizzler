@@ -16,8 +16,6 @@ SaunaSizzlerAudioProcessorEditor::SaunaSizzlerAudioProcessorEditor (SaunaSizzler
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     
-    
-    
     // Add all UI components
     addAndMakeVisible(bigBoyDial);
     addAndMakeVisible(lfoDial);
@@ -103,7 +101,7 @@ void SaunaSizzlerAudioProcessorEditor::updateUIMode()
         magicButton.setBounds(getWidth() / 2 - magicButton.getWidth() / 2,                          // x
                               header.getY() + header.getHeight() / 2 - magicButton.getHeight() / 2, // y
                               200, 45);                                                             // width and height
-        magicButton.setButtonText("Bring back the magic knob!");
+        magicButton.setButtonText("Bring back the big knob!");
     }
     else
     {
