@@ -110,7 +110,7 @@ void SaunaSizzlerAudioProcessorEditor::updateUIMode()
         magicButton.setBounds(getWidth() / 2 - magicButton.getWidth() / 2,                          // x
                               footer.getY() + footer.getHeight() / 2 - magicButton.getHeight() / 2, // y
                               200, 45);                                                             // width and height
-        magicButton.setButtonText("Not enough of controls?");
+        magicButton.setButtonText("Not enough controls?");
     }
 }
 
