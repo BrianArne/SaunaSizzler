@@ -61,13 +61,13 @@ public:
 private:
     enum ProcessorIndex
     {
-        exciterIndex = 0,
+        saturatorIndex = 0,
         steamerIndex,
         reverbIndex
     };
     
-    sauna::Exciter exciter;
-    juce::dsp::ProcessorChain<sauna::ExciterProcessor, sauna::SteamerProcessor, juce::dsp::Reverb> chain;
+    //juce::dsp::ProcessorChain<sauna::SaturatorProcessor, sauna::SteamerProcessor, juce::dsp::Reverb> chain;
+    juce::dsp::ProcessorChain<sauna::SaturatorProcessor> chain;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SaunaSizzlerAudioProcessor)
 };
