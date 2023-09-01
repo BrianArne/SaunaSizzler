@@ -17,6 +17,7 @@
 /**
 */
 class SaunaSizzlerAudioProcessorEditor  : public juce::AudioProcessorEditor
+                                        , public juce::Button::Listener
 {
 public:
     SaunaSizzlerAudioProcessorEditor (SaunaSizzlerAudioProcessor&);
@@ -25,8 +26,12 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
+    
+    void buttonClicked (juce::Button* button) override;
 
 private:
+    void updateUIMode();
+    
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     SaunaSizzlerAudioProcessor& audioProcessor;
@@ -34,13 +39,17 @@ private:
     juce::Component header;
     BigBoyDial bigBoyDial;
     
+    juce::TextButton magicButton;
+    
     juce::Component footer;
-    StandardDial lfoDial;
-    StandardDial reverbDial;
-    StandardDial steamDial;
+    StandardDial lfoDial { "LFO" };
+    StandardDial reverbDial { "Reverb" };
+    StandardDial steamDial { "Steam" };
     
     StandardDial smallLeftDial;
     StandardDial smallRightDial;
+    
+    bool advancedModeEnabled { false };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SaunaSizzlerAudioProcessorEditor)
 };
