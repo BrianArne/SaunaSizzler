@@ -264,7 +264,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout SaunaSizzlerAudioProcessor::
     params.add(std::make_unique<juce::AudioParameterFloat>("STEAMER_GAINDB",
                                                            "Steamer Gain dB",
                                                            juce::NormalisableRange<float>(-70.0f, 0.0f, 0.5f, 1.5f),
-                                                           -40.0f));
+                                                           -70.0f));
     
     // Reverb room size
     params.add(std::make_unique<juce::AudioParameterFloat>("REVERB_ROOMSIZE",
