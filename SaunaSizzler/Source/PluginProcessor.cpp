@@ -149,13 +149,15 @@ void SaunaSizzlerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::ScopedNoDenormals noDenormals;
     
    // Update parameters
-    
    auto saturatorPreGainDecibels = apvts.getRawParameterValue("SATURATOR_PREGAINDB");
    // auto& saturatorBlock = chain.get<0>();
    saturator.setPreGain(saturatorPreGainDecibels->load());
    
    auto saturatorType = apvts.getRawParameterValue("SATURATOR_TYPE");
    saturator.setSaturation(static_cast<sauna::Saturator::SaturationType>(saturatorType->load()));
+    
+    auto steamerGainDecibels = apvts.getRawParameterValue("STEAMER_GAINDB");
+    steamer.setGain(steamerGainDecibels->load());
     
     // LFO MOD
     float lfo[2] { 0.f, 0.f };
@@ -244,6 +246,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout SaunaSizzlerAudioProcessor::
                                                             "Saturator Type",
                                                             saturatorTypes,
                                                             4));
+    
+    // Steamer gain
+    params.add(std::make_unique<juce::AudioParameterFloat>("STEAMER_GAINDB",
+                                                           "Steamer Gain dB",
+                                                           juce::NormalisableRange<float>(-70.0f, 24.0f, 0.5f, 1.5f),
+                                                           -40.0f));
     
     return params;
 }
