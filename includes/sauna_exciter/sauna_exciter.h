@@ -131,6 +131,18 @@ public:
         }
     }
     
+    void process(float*  left,
+                 float*  right,
+                 const float*  modInput,
+                 unsigned int numChannels,
+                 unsigned int numSamples)
+    {
+        // To avoid using it in more than 2 channels
+        numChannels = std::min(numChannels, 2u);
+        *left += random.nextFloat() * 0.25f - 0.125f;
+        *right += random.nextFloat() * 0.25f - 0.125f;
+    }
+    
 private:
     juce::Random random;
 };
@@ -174,6 +186,23 @@ public:
     
 private:
     Steamer steamer;
+};
+
+
+class SteamerReverb : public juce::Reverb
+{
+public:
+    SteamerReverb() : juce::Reverb() {};
+    
+    void process(float*  left, //readArray
+                 float*  right, //writeArray
+                 const float*  modInput,
+                 unsigned int numChannels,
+                 unsigned int numSamples)
+    {
+        processStereo (left, right, numSamples);
+    }
+private:
 };
 
 } // end sauna namespace

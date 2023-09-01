@@ -107,11 +107,19 @@ void SaunaSizzlerAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     
     
     // Testing Params
-    juce::Reverb::Parameters reverbParams{1.0f, 0.5f, 0.9f, 0.4f, 1.0f, 0.0f};
-    chain.get<ProcessorIndex::reverbIndex>().setParameters(reverbParams);
+    juce::Reverb::Parameters reverbParams{0.3f, 0.5f, 0.5f, 0.4f, 1.0f, 0.0f};
+    steamerReverb.setParameters(reverbParams);
     
-    // Prepare chain
-    chain.prepare(spec);
+    // LFO Initilization
+    phaseState[0] = 0.f;
+    phaseState[1] = static_cast<float>(M_PI / 2.0);
+    phaseInc = static_cast<float>(2.0 * M_PI / sampleRate) * modRate;
+    
+    // Prepare processors
+    exciter.prepare(sampleRate);
+    steamerReverb.setSampleRate(sampleRate);
+    steamerReverb.reset();
+    steamer.prepare();
 }
 
 void SaunaSizzlerAudioProcessor::releaseResources()
@@ -148,44 +156,37 @@ bool SaunaSizzlerAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
 
 void SaunaSizzlerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
+    
+    //audio buffer has the input that should be replaced by the output
+    
     juce::ScopedNoDenormals noDenormals;
     
-    // Get channels
-    const unsigned int numChannels {static_cast<unsigned int>(buffer.getNumChannels())};
-    const unsigned int numSamples {static_cast<unsigned int>(buffer.getNumSamples())};
-    
-    // auto totalNumInputChannels  = getTotalNumInputChannels();
-    // auto totalNumOutputChannels = getTotalNumOutputChannels();
+    // LFO MOD
+    float lfo[2] { 0.f, 0.f };
+    lfo[0] = 0.5f + 0.5f * std::sin(phaseState[0]);
+    lfo[1] = 0.5f + 0.5f * std::sin(phaseState[1]);
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    // for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-    // buffer.clear (i, 0, buffer.getNumSamples());
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    // for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    // {
-    // auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
-    // }
+    // Increment and wrap phase states
+    phaseState[0] = std::fmod(phaseState[0] + phaseInc, static_cast<float>(2 * M_PI));
+    phaseState[1] = std::fmod(phaseState[1] + phaseInc, static_cast<float>(2 * M_PI));
     
-    // Apply exciter
-    // exciter.process(buffer.getArrayOfWritePointers(), buffer.getArrayOfReadPointers(), numChannels, numSamples);
-    
-    // process block
-    juce::dsp::AudioBlock<float> block(buffer);
-    juce::dsp::ProcessContextReplacing<float> context(block);
-    chain.process(context);
+    // Process single samples through each processor
+    // Audio buffer has the input that should be replaced by the output
+    for (int i = 0; i < buffer.getNumSamples(); i++){
+        //exciter.process()
+        
+        auto write = buffer.getArrayOfWritePointers(); // Pointer to a Pointer
+        auto read = buffer.getArrayOfReadPointers(); // Pointer to a Pointer
+        float* writeSampleArrayLeft = write[0];
+        float* writeSampleArrayRight = write[1];
+        float* x[2];
+        x[0] = writeSampleArrayLeft;
+        x[1] = writeSampleArrayRight;
+        
+        exiter.process(&(x[0][i]), &(x[1][i]), phaseState, buffer.getNumChannels(), 1);
+        steamerReverb.process(&(x[0][i]), &(x[1][i]), phaseState, buffer.getNumChannels(), 1);
+        steamer.process(&(x[0][i]), &(x[1][i]), phaseState, buffer.getNumChannels(), 1);
+    }
 }
 
 //==============================================================================
