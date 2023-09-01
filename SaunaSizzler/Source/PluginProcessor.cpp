@@ -94,7 +94,7 @@ void SaunaSizzlerAudioProcessor::changeProgramName (int index, const juce::Strin
 void SaunaSizzlerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Testing Params
-    juce::Reverb::Parameters reverbParams{0.3f, 0.5f, 0.5f, 0.4f, 1.0f, 0.0f};
+    juce::Reverb::Parameters reverbParams{0.5f, 0.5f, 0.5f, 0.4f, 1.0f, 0.0f};
     steamerReverb.setParameters(reverbParams);
     
     // LFO Initilization
@@ -159,19 +159,24 @@ void SaunaSizzlerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // Process single samples through each processor
     // Audio buffer has the input that should be replaced by the output
     for (int i = 0; i < buffer.getNumSamples(); i++){
-        //exciter.process()
-        
-        auto write = buffer.getArrayOfWritePointers(); // Pointer to a Pointer
-        auto read = buffer.getArrayOfReadPointers(); // Pointer to a Pointer
+        // We process in place, so we only need 1 sample frame of write pointers
+        auto write = buffer.getArrayOfWritePointers();
         float* writeSampleArrayLeft = write[0];
         float* writeSampleArrayRight = write[1];
-        float* x[2];
+        float* x[2] {writeSampleArrayLeft, writeSampleArrayRight};
         x[0] = writeSampleArrayLeft;
         x[1] = writeSampleArrayRight;
         
-//        saturator.process(&(x[0][i]), &(x[1][i]), phaseState, buffer.getNumChannels(), 1);
-        steamerReverb.process(&(x[0][i]), &(x[1][i]), phaseState, buffer.getNumChannels(), 1);
-        steamer.process(&(x[0][i]), &(x[1][i]), phaseState, buffer.getNumChannels(), 1);
+        int left = 0;
+        int right = 1;
+        if (buffer.getNumChannels() == 1) {
+            right = 0;
+        }
+        
+        
+        steamer.process(&(x[left][i]), &(x[right][i]), lfo, buffer.getNumChannels(), 1);
+        steamerReverb.process(&(x[left][i]), &(x[right][i]), lfo, buffer.getNumChannels(), 1);
+        saturator.process(&(x[left][i]), &(x[right][i]), lfo, buffer.getNumChannels(), 1);
     }
 }
 
