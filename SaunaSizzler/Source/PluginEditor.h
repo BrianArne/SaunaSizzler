@@ -45,8 +45,8 @@ private:
     StandardDial reverbDial { "Reverb" };
     StandardDial steamDial { "Steam" };
     
-    StandardDial smallLeftDial;
-    StandardDial smallRightDial;
+    StandardDial smallLeftDial { "Pre Gain" };
+    StandardDial smallRightDial { "Type" };
     
     bool advancedModeEnabled { false };
     
