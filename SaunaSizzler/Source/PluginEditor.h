@@ -42,7 +42,6 @@ private:
     juce::TextButton magicButton;
     
     juce::Component footer;
-    StandardDial lfoDial { "LFO" };
     StandardDial reverbDial { "Reverb" };
     StandardDial steamDial { "Steam" };
     

@@ -18,7 +18,6 @@ SaunaSizzlerAudioProcessorEditor::SaunaSizzlerAudioProcessorEditor (SaunaSizzler
     
     // Add all UI components
     addAndMakeVisible(bigBoyDial);
-    addAndMakeVisible(lfoDial);
     addAndMakeVisible(reverbDial);
     addAndMakeVisible(steamDial);
     addAndMakeVisible(smallLeftDial);
@@ -28,7 +27,6 @@ SaunaSizzlerAudioProcessorEditor::SaunaSizzlerAudioProcessorEditor (SaunaSizzler
     header.addChildComponent(bigBoyDial);
     
     // Footer
-    footer.addChildComponent(lfoDial);
     footer.addChildComponent(reverbDial);
     footer.addChildComponent(steamDial);
     footer.addChildComponent(smallLeftDial);
@@ -82,16 +80,17 @@ void SaunaSizzlerAudioProcessorEditor::resized()
     
     // Positioning footer elements
     auto footerArea = footer.getLocalBounds();
-    const auto contentItemWidth = lfoDial.getParentWidth() / 4;
+    const auto contentItemWidth = reverbDial.getParentWidth() / 3;
 
-    lfoDial.setBounds(footerArea.removeFromLeft (contentItemWidth));
     reverbDial.setBounds(footerArea.removeFromLeft (contentItemWidth));
     steamDial.setBounds(footerArea.removeFromLeft (contentItemWidth));
     
     const auto smallKnobHeight = contentItemWidth / 2;
-    smallLeftDial.setBounds(getWidth() - contentItemWidth, (footerArea.getHeight() - contentItemWidth) / 2, contentItemWidth / 2, contentItemWidth / 2);
+    smallLeftDial.setBounds(getWidth() - contentItemWidth,
+                            0,
+                            contentItemWidth / 2, contentItemWidth / 2);
     smallRightDial.setBounds(getWidth() - contentItemWidth / 2,
-                             footerArea.getHeight() / 2 - (footerArea.getHeight() / 2 - contentItemWidth / 2) / 2,
+                             footerArea.getHeight() - smallKnobHeight,
                              smallKnobHeight, smallKnobHeight);
     
     magicButton.setSize(150, 50);
