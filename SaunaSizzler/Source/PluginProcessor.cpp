@@ -19,8 +19,9 @@ SaunaSizzlerAudioProcessor::SaunaSizzlerAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ), apvts(*this, nullptr, "params", createParameters())
 #endif
+: apvts(*this, nullptr, "params", createParameters())
 {
 }
 
@@ -147,6 +148,15 @@ void SaunaSizzlerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     juce::ScopedNoDenormals noDenormals;
     
+   // Update parameters
+    
+   auto saturatorPreGainDecibels = apvts.getRawParameterValue("SATURATOR_PREGAINDB");
+   // auto& saturatorBlock = chain.get<0>();
+   saturator.setPreGain(saturatorPreGainDecibels->load());
+   
+   auto saturatorType = apvts.getRawParameterValue("SATURATOR_TYPE");
+   saturator.setSaturation(static_cast<sauna::Saturator::SaturationType>(saturatorType->load()));
+    
     // LFO MOD
     float lfo[2] { 0.f, 0.f };
     lfo[0] = 0.5f + 0.5f * std::sin(phaseState[0]);
@@ -169,7 +179,7 @@ void SaunaSizzlerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         x[0] = writeSampleArrayLeft;
         x[1] = writeSampleArrayRight;
         
-//        saturator.process(&(x[0][i]), &(x[1][i]), phaseState, buffer.getNumChannels(), 1);
+        // saturator.process(&(x[0][i]), &(x[1][i]), phaseState, buffer.getNumChannels(), 1);
         steamerReverb.process(&(x[0][i]), &(x[1][i]), phaseState, buffer.getNumChannels(), 1);
         steamer.process(&(x[0][i]), &(x[1][i]), phaseState, buffer.getNumChannels(), 1);
     }
@@ -205,4 +215,30 @@ void SaunaSizzlerAudioProcessor::setStateInformation (const void* data, int size
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new SaunaSizzlerAudioProcessor();
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout SaunaSizzlerAudioProcessor::createParameters()
+{
+    juce::AudioProcessorValueTreeState::ParameterLayout params;
+    
+    // preGaindB
+    params.add(std::make_unique<juce::AudioParameterFloat>("SATURATOR_PREGAINDB",
+                                                           "PreGain dB",
+                                                           0.0f,
+                                                           12.0f,
+                                                           6.0f));
+    
+    // Saturation type
+    juce::StringArray saturatorTypes;
+    saturatorTypes.add("Tanh");
+    saturatorTypes.add("ASinh");
+    saturatorTypes.add("HardClipping");
+    saturatorTypes.add("SoftClipping");
+    saturatorTypes.add("Tube");
+    params.add(std::make_unique<juce::AudioParameterChoice>("SATURATOR_TYPE",
+                                                            "Saturator Type",
+                                                            saturatorTypes,
+                                                            4));
+    
+    return params;
 }

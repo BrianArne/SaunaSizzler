@@ -42,6 +42,13 @@ SaunaSizzlerAudioProcessorEditor::SaunaSizzlerAudioProcessorEditor (SaunaSizzler
     
     magicButton.addListener(this);
     updateUIMode();
+    
+    // Attach components
+    saturatorPreGainDecibelsSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,
+                                                                                                                      "SATURATOR_PREGAINDB", smallLeftDial);
+    saturatorSaturationTypeSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,
+                                                                                                                     "SATURATOR_TYPE", smallRightDial);
+    
 }
 
 SaunaSizzlerAudioProcessorEditor::~SaunaSizzlerAudioProcessorEditor()

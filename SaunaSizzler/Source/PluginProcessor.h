@@ -57,6 +57,8 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    
+    juce::AudioProcessorValueTreeState apvts;
 
 private:
     enum ProcessorIndex
@@ -66,6 +68,8 @@ private:
         reverbIndex
     };
     
+    juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
+    
     sauna::Saturator saturator;
     sauna::SteamerReverb steamerReverb;
     sauna::Steamer steamer;
@@ -74,7 +78,6 @@ private:
     float phaseState[2] { 0.f, 0.f };
     float phaseInc { 0.f };
     float modRate { 0.f };
-    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SaunaSizzlerAudioProcessor)
 };
