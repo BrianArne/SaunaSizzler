@@ -50,6 +50,9 @@ private:
     StandardDial smallRightDial;
     
     bool advancedModeEnabled { false };
+    
+    // Attachments
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> saturatorPreGainDecibelsSliderAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SaunaSizzlerAudioProcessorEditor)
 };

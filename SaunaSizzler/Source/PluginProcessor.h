@@ -57,6 +57,8 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    
+    juce::AudioProcessorValueTreeState apvts;
 
 private:
     enum ProcessorIndex
@@ -65,6 +67,10 @@ private:
         steamerIndex,
         reverbIndex
     };
+    
+    juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
+    
+    // juce::AudioProcessorValueTreeState::ParameterLayout createParametersLayout();
     
     //juce::dsp::ProcessorChain<sauna::SaturatorProcessor, sauna::SteamerProcessor, juce::dsp::Reverb> chain;
     juce::dsp::ProcessorChain<sauna::SaturatorProcessor> chain;

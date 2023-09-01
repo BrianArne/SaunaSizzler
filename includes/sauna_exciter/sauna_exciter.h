@@ -29,7 +29,8 @@ public:
     ~Saturator() {};
     
     // This enum is the only thing that is necessary to hook up to the front end
-    enum SaturationType {
+    enum SaturationType
+    {
         Tanh,
         ASinh,
         HardClipping,
@@ -72,15 +73,23 @@ public:
         }
     }
     
-    float applyTanh(float x) {
+    void setPreGain(float db)
+    {
+        preGain = juce::Decibels::decibelsToGain(db);
+    }
+    
+    float applyTanh(float x)
+    {
         return std::tanhf(x);
     }
     
-    float applyASinh(float x) {
+    float applyASinh(float x)
+    {
         return std::asinhf(x);
     }
     
-    float applySoftClipping(float x){
+    float applySoftClipping(float x)
+    {
         if (x > 1.0f) {
             return 2.0f / 3.0f;
         }
@@ -92,7 +101,8 @@ public:
         return x - (x * x * x) / 3.0f;
     }
     
-    float applyHardClipping(float x) {
+    float applyHardClipping(float x)
+    {
         if (x > 1.0f) {
             return 1.0f;
         }
@@ -104,7 +114,8 @@ public:
         return x;
     }
     
-    float applyTubeSaturator(float x) {
+    float applyTubeSaturator(float x)
+    {
         if (x == tubeQ) {
             return (1.0f / tubeDist) + (tubeQ / (1.0f - expf(tubeDist * tubeQ)));
         } else {
@@ -112,7 +123,8 @@ public:
         }
     }
 
-    void process(float* const* output, const float* const* input, unsigned int numChannels, unsigned int numSamples) {
+    void process(float* const* output, const float* const* input, unsigned int numChannels, unsigned int numSamples)
+    {
         
         // To avoid using it in more than 2 channels
         numChannels = std::min(numChannels, 2u);
@@ -174,8 +186,9 @@ public:
         
     }
     
-private:
     Saturator saturator;
+    
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SaturatorProcessor)
 };
 
