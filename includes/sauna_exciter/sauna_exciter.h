@@ -139,6 +139,18 @@ public:
         }
     }
     
+    void process(float*  left,
+                 float*  right,
+                 const float*  modInput,
+                 unsigned int numChannels,
+                 unsigned int numSamples)
+    {
+        auto leftVal = *left;
+        auto rightVal = *right;
+        *left = saturation(preGain * leftVal);
+        *right = saturation(preGain * rightVal);
+    }
+    
 private:
     float preGain;
     float tubeQ;
@@ -206,7 +218,10 @@ public:
     Steamer(Steamer&&) = delete;
     const Steamer& operator=(Steamer&&) = delete;
     
-    void prepare() { }
+    void prepare() {setGain(-12.f); }
+    
+    float getGain() { return gain; }
+    void setGain(float db) { gain = juce::Decibels::decibelsToGain(db); }
 
     void process(float* const* output, const float* const* input, unsigned int numChannels, unsigned int numSamples) {
         
@@ -229,14 +244,17 @@ public:
                  unsigned int numChannels,
                  unsigned int numSamples)
     {
-        // To avoid using it in more than 2 channels
-        numChannels = std::min(numChannels, 2u);
-        *left += random.nextFloat() * 0.25f - 0.125f;
-        *right += random.nextFloat() * 0.25f - 0.125f;
+        if (left == right) {
+            *left += random.nextFloat() * (modInput[0]) * gain ;
+        }else {
+            *left += random.nextFloat() * modInput[0] * gain;
+            *right += random.nextFloat() * modInput[1] * gain;
+        }
     }
     
 private:
     juce::Random random;
+    float gain;
 };
 
 
