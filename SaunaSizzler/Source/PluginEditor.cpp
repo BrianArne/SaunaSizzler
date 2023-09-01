@@ -48,6 +48,9 @@ SaunaSizzlerAudioProcessorEditor::SaunaSizzlerAudioProcessorEditor (SaunaSizzler
                                                                                                                      "SATURATOR_TYPE", smallRightDial);
     steamerGainDecibelsSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,
                                                                                                                  "STEAMER_GAINDB", steamDial);
+    
+    steamerReverbRoomSizeSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,
+                                                                                                                   "REVERB_ROOMSIZE", reverbDial);
 }
 
 SaunaSizzlerAudioProcessorEditor::~SaunaSizzlerAudioProcessorEditor()

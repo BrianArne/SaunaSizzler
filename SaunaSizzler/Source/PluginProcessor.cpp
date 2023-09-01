@@ -159,6 +159,11 @@ void SaunaSizzlerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     auto steamerGainDecibels = apvts.getRawParameterValue("STEAMER_GAINDB");
     steamer.setGain(steamerGainDecibels->load());
     
+    auto reverbRoomSize = apvts.getRawParameterValue("REVERB_ROOMSIZE");
+    auto steamerReverbParams = steamerReverb.getParameters();
+    steamerReverbParams.roomSize = reverbRoomSize->load();
+    steamerReverb.setParameters(steamerReverbParams);
+    
     // LFO MOD
     float lfo[2] { 0.f, 0.f };
     lfo[0] = 0.5f + 0.5f * std::sin(phaseState[0]);
@@ -252,6 +257,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout SaunaSizzlerAudioProcessor::
                                                            "Steamer Gain dB",
                                                            juce::NormalisableRange<float>(-70.0f, 24.0f, 0.5f, 1.5f),
                                                            -40.0f));
+    
+    // Reverb room size
+    params.add(std::make_unique<juce::AudioParameterFloat>("REVERB_ROOMSIZE",
+                                                           "Reverb Room Size",
+                                                           0.0f,
+                                                           1.0f,
+                                                           0.5f));
     
     return params;
 }
