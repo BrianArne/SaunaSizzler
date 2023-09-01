@@ -51,6 +51,9 @@ SaunaSizzlerAudioProcessorEditor::SaunaSizzlerAudioProcessorEditor (SaunaSizzler
     
     steamerReverbRoomSizeSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,
                                                                                                                    "REVERB_ROOMSIZE", reverbDial);
+    
+    lfoRateSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts,
+                                                                                                     "LFO_RATE", bigBoyDial);
 }
 
 SaunaSizzlerAudioProcessorEditor::~SaunaSizzlerAudioProcessorEditor()

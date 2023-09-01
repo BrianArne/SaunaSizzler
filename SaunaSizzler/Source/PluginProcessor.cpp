@@ -164,6 +164,9 @@ void SaunaSizzlerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     steamerReverbParams.roomSize = reverbRoomSize->load();
     steamerReverb.setParameters(steamerReverbParams);
     
+    auto lfoRate = apvts.getRawParameterValue("LFO_RATE");
+    updatePhaseIncrement(lfoRate->load());
+    
     // LFO MOD
     float lfo[2] { 0.f, 0.f };
     lfo[0] = 0.5f + 0.5f * std::sin(phaseState[0]);
@@ -229,6 +232,11 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new SaunaSizzlerAudioProcessor();
 }
 
+void SaunaSizzlerAudioProcessor::updatePhaseIncrement(float modRate) {
+    double sampleRate = getSampleRate();
+    phaseInc = static_cast<float>(2.0 * M_PI / sampleRate) * modRate;
+}
+
 juce::AudioProcessorValueTreeState::ParameterLayout SaunaSizzlerAudioProcessor::createParameters()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout params;
@@ -264,6 +272,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout SaunaSizzlerAudioProcessor::
                                                            0.0f,
                                                            1.0f,
                                                            0.5f));
+    
+    // LFO rate
+    params.add(std::make_unique<juce::AudioParameterFloat>("LFO_RATE",
+                                                           "LFO Rate",
+                                                           50.0f,
+                                                           1000.0f,
+                                                           100.0f));
     
     return params;
 }

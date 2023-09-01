@@ -57,6 +57,8 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> steamerGainDecibelsSliderAttachment;
     
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> steamerReverbRoomSizeSliderAttachment;
+    
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> lfoRateSliderAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SaunaSizzlerAudioProcessorEditor)
 };

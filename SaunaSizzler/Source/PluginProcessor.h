@@ -57,6 +57,7 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    void updatePhaseIncrement (float modRate);
     
     juce::AudioProcessorValueTreeState apvts;
 
@@ -77,7 +78,7 @@ private:
     // LFO states
     float phaseState[2] { 0.f, 0.f };
     float phaseInc { 0.f };
-    float modRate { 50.f };
+    float modRate { 100.0f };
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SaunaSizzlerAudioProcessor)
