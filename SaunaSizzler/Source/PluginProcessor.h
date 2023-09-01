@@ -66,8 +66,15 @@ private:
         reverbIndex
     };
     
-    //juce::dsp::ProcessorChain<sauna::SaturatorProcessor, sauna::SteamerProcessor, juce::dsp::Reverb> chain;
-    juce::dsp::ProcessorChain<sauna::SaturatorProcessor> chain;
+    sauna::Saturator saturator;
+    sauna::SteamerReverb steamerReverb;
+    sauna::Steamer steamer;
+
+    // LFO states
+    float phaseState[2] { 0.f, 0.f };
+    float phaseInc { 0.f };
+    float modRate { 0.f };
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SaunaSizzlerAudioProcessor)
 };
